@@ -1,6 +1,6 @@
 package com.sksamuel.avro4s.schema
 
-import com.sksamuel.avro4s.{AvroName, AvroSchema, SnakeCase}
+import com.sksamuel.avro4s.{AvroName, AvroSchema, AvroSortPriority, SnakeCase}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
@@ -40,9 +40,23 @@ class AvroNameSchemaTest extends AnyFunSuite with Matchers {
     schema.toString(true) shouldBe expected.toString(true)
   }
 
+  test("@AvroName on sealed trait enum symbol") {
+    val schema = AvroSchema[Benelux]
+    val expected = new org.apache.avro.Schema.Parser().parse(getClass.getResourceAsStream("/avro_name_sealed_trait_symbol.json"))
+    schema.toString(true) shouldBe expected.toString(true)
+  }
 }
 
 @AvroName("foofoo")
 sealed trait Weather
 case object Rainy extends Weather
 case object Sunny extends Weather
+
+sealed trait Benelux
+@AvroName("foofoo")
+@AvroSortPriority(-1)
+case object Belgium extends Benelux
+case object Vlaanderen extends Benelux
+case object Luxembourg extends Benelux
+@AvroSortPriority(1)
+case object Netherlands extends Benelux
